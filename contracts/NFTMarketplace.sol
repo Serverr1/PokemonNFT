@@ -8,34 +8,32 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "hardhat/console.sol";
 
 contract NFTMarketplace is ReentrancyGuard {
-
-  
-    uint public itemCount = 0; 
+    uint256 public itemCount = 0;
 
     struct Item {
-        uint itemId;
+        uint256 itemId;
         IERC721 nft;
-        uint tokenId;
-        uint price;
+        uint256 tokenId;
+        uint256 price;
         address payable seller;
         bool sold;
     }
 
     // itemId -> Item
-    mapping(uint => Item) public items;
+    mapping(uint256 => Item) public items;
 
     event Offered(
-        uint itemId,
+        uint256 itemId,
         address indexed nft,
-        uint tokenId,
-        uint price,
+        uint256 tokenId,
+        uint256 price,
         address indexed seller
     );
     event Bought(
-        uint itemId,
+        uint256 itemId,
         address indexed nft,
-        uint tokenId,
-        uint price,
+        uint256 tokenId,
+        uint256 price,
         address indexed seller,
         address indexed buyer
     );
@@ -46,14 +44,18 @@ contract NFTMarketplace is ReentrancyGuard {
     }*/
 
     // Make item to offer on the marketplace
-    function makeItem(IERC721 _nft, uint _tokenId, uint _price) external nonReentrant {
+    function makeItem(
+        IERC721 _nft,
+        uint256 _tokenId,
+        uint256 _price
+    ) external nonReentrant {
         require(_price > 0, "Price must be greater than zero");
         // increment itemCount
-        itemCount ++;
+        itemCount++;
         // transfer nft
         _nft.transferFrom(msg.sender, address(this), _tokenId);
         // add new item to items mapping
-        items[itemCount] = Item (
+        items[itemCount] = Item(
             itemCount,
             _nft,
             _tokenId,
@@ -62,20 +64,16 @@ contract NFTMarketplace is ReentrancyGuard {
             false
         );
         // emit Offered event
-        emit Offered(
-            itemCount,
-            address(_nft),
-            _tokenId,
-            _price,
-            msg.sender
-        );
+        emit Offered(itemCount, address(_nft), _tokenId, _price, msg.sender);
     }
 
-    function purchaseItem(uint _itemId) external payable nonReentrant {
-                                                                
+    function purchaseItem(uint256 _itemId) external payable nonReentrant {
         Item storage item = items[_itemId];
         require(_itemId > 0 && _itemId <= itemCount, "item doesn't exist");
-        require(msg.value >= item.price, "not enough ether to cover item price and market fee");
+        require(
+            msg.value >= item.price,
+            "not enough ether to cover item price and market fee"
+        );
         require(!item.sold, "item already sold");
         // pay seller and feeAccount
         item.seller.transfer(item.price);
@@ -94,14 +92,11 @@ contract NFTMarketplace is ReentrancyGuard {
         );
     }
 
+    function getItem(uint256 _itemId) public view returns (Item memory) {
+        return items[_itemId];
+    }
 
-function getItem(uint _itemId) public view returns (Item memory) {
-		return items[_itemId];
-	}
-
-   
-
-     function getItemCount() view public returns(uint){
+    function getItemCount() public view returns (uint256) {
         return itemCount;
     }
 }

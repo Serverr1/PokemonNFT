@@ -11,28 +11,33 @@ contract MyNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
-     uint public tokenCount;
+    uint256 public tokenCount;
 
     constructor() ERC721("MyNFT", "MNFT") {}
 
-     function mint(string memory _tokenURI) external returns(uint) {
-        tokenCount ++;
+    function mint(string memory _tokenURI) external returns (uint256) {
+        tokenCount++;
+
         _safeMint(msg.sender, tokenCount);
         _setTokenURI(tokenCount, _tokenURI);
-        return(tokenCount);
-    }
 
+        return (tokenCount);
+    }
 
     // The following functions are overrides required by Solidity.
 
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId)
-        internal
-        override(ERC721, ERC721Enumerable)
-    {
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override(ERC721, ERC721Enumerable) {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
-    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+    function _burn(uint256 tokenId)
+        internal
+        override(ERC721, ERC721URIStorage)
+    {
         super._burn(tokenId);
     }
 

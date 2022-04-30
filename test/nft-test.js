@@ -18,30 +18,30 @@ describe("MyNFT", function () {
     myNFT = await MyNFT.deploy();
   });
 
-  it("Should set the right owner", async function () {
+  it("should set the right owner", async function () {
     expect(await myNFT.owner()).to.equal(owner.address);
   });
 
-  it("Should mint one NFT", async function () {
+  it("should mint one NFT to sender", async function () {
     expect(await myNFT.balanceOf(acc1.address)).to.equal(0);
 
     const tokenURI = "https://example.com/1";
-    const tx = await myNFT.connect(owner).safeMint(acc1.address, tokenURI);
+    const tx = await myNFT.connect(acc1).mint(tokenURI);
     await tx.wait();
 
     expect(await myNFT.balanceOf(acc1.address)).to.equal(1);
   });
 
-  it("Should set the correct tokenURI", async function () {
+  it("should set the correct tokenURI", async function () {
     const tokenURI_1 = "https://example.com/1";
     const tokenURI_2 = "https://example.com/2";
 
-    const tx1 = await myNFT.connect(owner).safeMint(acc1.address, tokenURI_1);
+    const tx1 = await myNFT.connect(owner).mint(tokenURI_1);
     await tx1.wait();
-    const tx2 = await myNFT.connect(owner).safeMint(acc2.address, tokenURI_2);
+    const tx2 = await myNFT.connect(owner).mint(tokenURI_2);
     await tx2.wait();
 
-    expect(await myNFT.tokenURI(0)).to.equal(tokenURI_1);
-    expect(await myNFT.tokenURI(1)).to.equal(tokenURI_2);
+    expect(await myNFT.tokenURI(1)).to.equal(tokenURI_1);
+    expect(await myNFT.tokenURI(2)).to.equal(tokenURI_2);
   });
 });
