@@ -4,17 +4,17 @@ import { Card, Col, Badge, Stack, Row } from "react-bootstrap";
 import { truncateAddress } from "../../../utils";
 import Identicon from "../../ui/Identicon";
 
-const NftCard = ({ nft, purchaseItem }) => {
-  const { contractOwner, price, image, description, owner, name, index, attributes } = nft;
+const NftCard = ({ nft, purchaseItem, isSold, isOwner }) => {
+  const { owner, price, image, description, name, index, attributes } = nft;
 
   return (
     <Col key={index}>
       <Card className=" h-100">
         <Card.Header>
           <Stack direction="horizontal" gap={2}>
-            <Identicon address={contractOwner} size={28} />
+            <Identicon address={owner} size={28} />
             <span className="font-monospace text-secondary">
-              {truncateAddress(contractOwner)}
+              {truncateAddress(owner)}
             </span>
             <Badge bg="secondary" className="ms-auto">
               {index} ID
@@ -48,9 +48,22 @@ const NftCard = ({ nft, purchaseItem }) => {
               ))}
             </Row>
           </div>
-          <div className="d-flex m-2 justify-content-center">
-              <button onClick={purchaseItem} className="btn btn-primary">Buy</button>
-          </div>
+
+          {isSold ? (
+            <div className="d-flex m-2 justify-content-center">
+              <button
+                className={`btn ${isOwner ? "btn-danger" : "btn-secondary"}`}
+              >
+                {isOwner ? "Bought" : "Sold"}
+              </button>
+            </div>
+          ) : (
+            <div className="d-flex m-2 justify-content-center">
+              <button onClick={purchaseItem} className="btn btn-primary">
+                Buy
+              </button>
+            </div>
+          )}
         </Card.Body>
       </Card>
     </Col>
