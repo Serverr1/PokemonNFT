@@ -5,4 +5,4 @@ PokemonNFT is where users can buy rare pokemon cards as nfts. after going throug
 
 # Live Demo
 
-https://resilient-lamington-abe2eb.netlify.app/
+https://comfy-eclair-38a69f.netlify.app/
