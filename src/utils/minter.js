@@ -1,8 +1,7 @@
 import { create as ipfsHttpClient } from "ipfs-http-client";
 import axios from "axios";
-import NFTMarketplaceContractAddress from "../contracts/NFTMarketplace-address.json";
 import MyNFTContractAddress from "../contracts/MyNFT-address.json";
-import NFTMarketplaceAddress from "../contracts/NFTMarketplace-address.json";
+import NFTMarketplaceContractAddress from "../contracts/NFTMarketplace-address.json";
 import { BigNumber, ethers } from "ethers";
 
 // initialize IPFS
@@ -48,7 +47,7 @@ export const createNft = async (
       console.log(auctionPrice);
 
       await minterContract.methods
-        .approve(NFTMarketplaceAddress.NFTMarketplace, tokenCount)
+        .approve(NFTMarketplaceContractAddress.NFTMarketplace, tokenCount)
         .send({ from: kit.defaultAccount });
 
       await marketplaceContract.methods
@@ -87,12 +86,13 @@ export const getNfts = async (minterContract, marketplaceContract) => {
       const nft = new Promise(async (resolve) => {
         const item = await marketplaceContract.methods.getItem(i).call();
         const res = await minterContract.methods.tokenURI(item.tokenId).call();
+        const owner = await minterContract.methods.ownerOf(item.tokenId).call();
 
         const meta = await fetchNftMeta(res);
-        const owner = await fetchNftOwner(minterContract, item.tokenId);
         resolve({
           index: i,
-          contractOwner: owner,
+          owner,
+          sold: item.sold,
           itemId: item.tokenId,
           nft: item.nft,
           tokenId: item.tokenId,

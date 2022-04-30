@@ -6,12 +6,7 @@ import AddNfts from "./Add";
 import Nft from "./Card";
 import Loader from "../../ui/Loader";
 import { NotificationSuccess, NotificationError } from "../../ui/Notifications";
-import {
-  getNfts,
-  createNft,
-  fetchNftContractOwner,
-  purchaseItem,
-} from "../../../utils/minter";
+import { getNfts, createNft, purchaseItem } from "../../../utils/minter";
 import { Row } from "react-bootstrap";
 
 const NftList = ({ minterContract, marketplaceContract, name }) => {
@@ -21,14 +16,13 @@ const NftList = ({ minterContract, marketplaceContract, name }) => {
   const { performActions, address } = useContractKit();
   const [nfts, setNfts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [nftOwner, setNftOwner] = useState(null);
 
   const getAssets = useCallback(async () => {
     try {
       setLoading(true);
 
       // fetch all nfts from the smart contract
-      const allNfts = await getNfts(minterContract, marketplaceContract, name);
+      const allNfts = await getNfts(minterContract, marketplaceContract);
       if (!allNfts) return;
       setNfts(allNfts);
     } catch (error) {
@@ -59,9 +53,10 @@ const NftList = ({ minterContract, marketplaceContract, name }) => {
     }
   };
 
-  const purchaseItem = async (index, tokenId) => {
+  const buy = async (index, tokenId) => {
     try {
       setLoading(true);
+
       await purchaseItem(
         minterContract,
         marketplaceContract,
@@ -69,6 +64,7 @@ const NftList = ({ minterContract, marketplaceContract, name }) => {
         index,
         tokenId
       );
+
       toast(<NotificationSuccess text="Updating NFT list...." />);
       getAssets();
     } catch (error) {
@@ -79,22 +75,15 @@ const NftList = ({ minterContract, marketplaceContract, name }) => {
     }
   };
 
-  const fetchContractOwner = useCallback(async (minterContract) => {
-    // get the address that deployed the NFT contract
-    const _address = await fetchNftContractOwner(minterContract);
-    setNftOwner(_address);
-  }, []);
-
   useEffect(() => {
     try {
       if (address && minterContract) {
         getAssets();
-        fetchContractOwner(minterContract);
       }
     } catch (error) {
       console.log({ error });
     }
-  }, [minterContract, address, getAssets, fetchContractOwner]);
+  }, [minterContract, address, getAssets]);
   if (address) {
     return (
       <>
@@ -103,20 +92,19 @@ const NftList = ({ minterContract, marketplaceContract, name }) => {
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h1 className="fs-4 fw-bold mb-0">{name}</h1>
 
-              {/* give the add NFT permission to user who deployed the NFT smart contract */}
-              {/* {nftOwner === address ? ( */}
               <AddNfts save={addNft} address={address} />
-              {/* ) : null} */}
             </div>
             <Row xs={1} sm={2} lg={3} className="g-3  mb-5 g-xl-4 g-xxl-5">
               {/* display all NFTs */}
               {nfts.map((_nft) => (
                 <Nft
                   key={_nft.index}
-                  purchaseItem={() => purchaseItem(_nft.index, _nft.tokenId)}
+                  purchaseItem={() => buy(_nft.index, _nft.tokenId)}
                   nft={{
                     ..._nft,
                   }}
+                  isOwner={_nft.owner === address}
+                  isSold={_nft.sold}
                 />
               ))}
             </Row>
