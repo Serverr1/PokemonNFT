@@ -14,12 +14,11 @@ import {
 } from "../../../utils/minter";
 import { Row } from "react-bootstrap";
 
-const NftList = ({minterContract, marketplaceContract, name}) => {
-
+const NftList = ({ minterContract, marketplaceContract, name }) => {
   /* performActions : used to run smart contract interactions in order
-  *  address : fetch the address of the connected wallet
-  */
-  const {performActions, address} = useContractKit();
+   *  address : fetch the address of the connected wallet
+   */
+  const { performActions, address } = useContractKit();
   const [nfts, setNfts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [nftOwner, setNftOwner] = useState(null);
@@ -30,7 +29,7 @@ const NftList = ({minterContract, marketplaceContract, name}) => {
 
       // fetch all nfts from the smart contract
       const allNfts = await getNfts(minterContract, marketplaceContract, name);
-      if (!allNfts) return
+      if (!allNfts) return;
       setNfts(allNfts);
     } catch (error) {
       console.log({ error });
@@ -44,8 +43,13 @@ const NftList = ({minterContract, marketplaceContract, name}) => {
       setLoading(true);
 
       // create an nft functionality
-      await createNft(minterContract, marketplaceContract, performActions, data);
-      toast(<NotificationSuccess text="Updating NFT list...."/>);
+      await createNft(
+        minterContract,
+        marketplaceContract,
+        performActions,
+        data
+      );
+      toast(<NotificationSuccess text="Updating NFT list...." />);
       getAssets();
     } catch (error) {
       console.log({ error });
@@ -54,7 +58,6 @@ const NftList = ({minterContract, marketplaceContract, name}) => {
       setLoading(false);
     }
   };
-
 
   const purchaseItem = async (index, tokenId) => {
     try {
@@ -77,7 +80,6 @@ const NftList = ({minterContract, marketplaceContract, name}) => {
   };
 
   const fetchContractOwner = useCallback(async (minterContract) => {
-
     // get the address that deployed the NFT contract
     const _address = await fetchNftContractOwner(minterContract);
     setNftOwner(_address);
@@ -102,22 +104,20 @@ const NftList = ({minterContract, marketplaceContract, name}) => {
               <h1 className="fs-4 fw-bold mb-0">{name}</h1>
 
               {/* give the add NFT permission to user who deployed the NFT smart contract */}
-              {nftOwner === address ? (
-                  <AddNfts save={addNft} address={address}/>
-              ) : null}
-
+              {/* {nftOwner === address ? ( */}
+              <AddNfts save={addNft} address={address} />
+              {/* ) : null} */}
             </div>
             <Row xs={1} sm={2} lg={3} className="g-3  mb-5 g-xl-4 g-xxl-5">
-
               {/* display all NFTs */}
               {nfts.map((_nft) => (
-                  <Nft
-                      key={_nft.index}
-                      purchaseItem={() => purchaseItem(_nft.index, _nft.tokenId)}
-                      nft={{
-                        ..._nft,
-                      }}
-                  />
+                <Nft
+                  key={_nft.index}
+                  purchaseItem={() => purchaseItem(_nft.index, _nft.tokenId)}
+                  nft={{
+                    ..._nft,
+                  }}
+                />
               ))}
             </Row>
           </>
@@ -131,7 +131,6 @@ const NftList = ({minterContract, marketplaceContract, name}) => {
 };
 
 NftList.propTypes = {
-
   // props passed into this component
   minterContract: PropTypes.instanceOf(Object),
   marketplaceContract: PropTypes.instanceOf(Object),
